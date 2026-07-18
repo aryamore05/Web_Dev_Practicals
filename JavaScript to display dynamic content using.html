@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>DOM Manipulation Demo</title>
+
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            background-color: #f4f4f4;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        p {
+            font-size: 16px;
+            color: #444;
+        }
+
+        button {
+            padding: 8px 18px;
+            margin: 6px 6px 6px 0;
+            font-size: 14px;
+            border: 1px solid #aaa;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #ffffff;
+        }
+
+        button:hover {
+            background-color: #e2e6ea;
+        }
+
+        #output {
+            margin-top: 20px;
+            padding: 12px;
+            border: 1px dashed #bbb;
+            border-radius: 4px;
+            background-color: #ffffff;
+            min-height: 40px;
+        }
+
+        .highlight {
+            background-color: yellow;
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <h1 id="mainTitle">
+        DOM Manipulation Demo
+    </h1>
+
+    <p id="message">
+        This is the original message paragraph.
+    </p>
+
+    <button onclick="changeText()">
+        Change Text
+    </button>
+
+    <button onclick="changeStyle()">
+        Change Style
+    </button>
+
+    <button onclick="addElement()">
+        Add Element
+    </button>
+
+    <button onclick="toggleClass()">
+        Toggle Highlight
+    </button>
+
+    <div id="output"></div>
+
+    <script>
+
+        var counter = 1;
+
+        function changeText() {
+
+            document.getElementById("mainTitle").textContent =
+                "Title Changed by JavaScript!";
+
+            document.getElementById("message").textContent =
+                "The paragraph text has been updated using DOM manipulation.";
+        }
+
+        function changeStyle() {
+
+            var message =
+                document.getElementById("message");
+
+            message.style.color = "#c0392b";
+            message.style.fontSize = "20px";
+        }
+
+        function addElement() {
+
+            var output =
+                document.getElementById("output");
+
+            var newPara =
+                document.createElement("p");
+
+            newPara.textContent =
+                "New paragraph added — item number " + counter;
+
+            output.appendChild(newPara);
+
+            counter++;
+        }
+
+        function toggleClass() {
+
+            document.getElementById("message")
+                    .classList.toggle("highlight");
+        }
+
+    </script>
+
+</body>
+
+</html>

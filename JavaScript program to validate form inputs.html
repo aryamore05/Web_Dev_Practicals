@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Form Validation</title>
+
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            background-color: #f4f4f4;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #444;
+        }
+
+        input[type="text"],
+        input[type="email"] {
+            width: 300px;
+            padding: 8px 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        input[type="submit"] {
+            padding: 8px 24px;
+            background-color: #0d6efd;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #0b5ed7;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <h2>Student Registration</h2>
+
+    <form onsubmit="return validate()">
+
+        <div class="form-group">
+
+            <label for="name">Name:</label>
+
+            <input type="text"
+                   id="name"
+                   placeholder="Enter your full name">
+
+        </div>
+
+        <div class="form-group">
+
+            <label for="email">Email Address:</label>
+
+            <input type="email"
+                   id="email"
+                   placeholder="Enter your email">
+
+        </div>
+
+        <div class="form-group">
+
+            <input type="submit"
+                   value="Submit">
+
+        </div>
+
+    </form>
+
+    <script>
+
+        function validate() {
+
+            var name =
+                document.getElementById("name").value.trim();
+
+            var email =
+                document.getElementById("email").value.trim();
+
+            var emailPattern =
+                /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (name === "") {
+
+                alert("Error: Name field cannot be empty.");
+
+                return false;
+            }
+
+            if (email === "") {
+
+                alert("Error: Email field cannot be empty.");
+
+                return false;
+            }
+
+            if (!emailPattern.test(email)) {
+
+                alert("Error: Please enter a valid email address.");
+
+                return false;
+            }
+
+            alert("Success! Form submitted successfully.");
+
+            return true;
+        }
+
+    </script>
+
+</body>
+
+</html>
