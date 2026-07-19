@@ -1,101 +1,97 @@
-const addTodoBtn = document.getElementById("addTodoBtn");
-const inputTag = document.getElementById("todoInput");
-const todoListUl = document.getElementById("todoList");
-const remaining = document.getElementById("itemsLeft"); // FIXED ID
-const clearCompletedBtn = document.getElementById("clearCompletedBtn");
+const form = document.getElementById("todoForm");
+const input = document.getElementById("todoInput");
+const todoList = document.getElementById("todoList");
+const itemsLeft = document.getElementById("itemsLeft");
+const clearCompletedButton = document.getElementById("clearCompletedBtn");
+const formMessage = document.getElementById("formMessage");
+const filterButtons = [...document.querySelectorAll(".filter-btn")];
 
-let todos = [];
-let todosString = localStorage.getItem("todos");
+const STORAGE_KEY = "my-todo-list-v1";
+let activeFilter = "all";
+let todos = loadTodos();
 
-// Load from localStorage
-if (todosString) {
-  todos = JSON.parse(todosString);
+function loadTodos() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    return Array.isArray(saved) ? saved.filter(isValidTodo) : [];
+  } catch { return []; }
 }
 
-// ✅ Helper to update remaining count
-const updateRemaining = () => {
-  remaining.innerHTML = `${todos.filter(todo => !todo.isCompleted).length} items left`;
-};
+function isValidTodo(todo) {
+  return todo && typeof todo.id === "string" && typeof todo.title === "string" && typeof todo.isCompleted === "boolean";
+}
 
-// ✅ Render todos
-const populateTodos = () => {
-  let string = "";
+function saveTodos() { localStorage.setItem(STORAGE_KEY, JSON.stringify(todos)); }
 
-  for (const todo of todos) {
-    string += `
-      <li id="${todo.id}" class="todo-item ${todo.isCompleted ? "completed" : ""}">
-        <input type="checkbox" class="todo-checkbox" ${todo.isCompleted ? "checked" : ""}>
-        <span class="todo-text">${todo.title}</span>
-        <button class="delete-btn">×</button>
-      </li>
-    `;
-  }
+function visibleTodos() {
+  if (activeFilter === "active") return todos.filter(todo => !todo.isCompleted);
+  if (activeFilter === "completed") return todos.filter(todo => todo.isCompleted);
+  return todos;
+}
 
-  todoListUl.innerHTML = string;
+function makeTodoElement(todo) {
+  const item = document.createElement("li");
+  item.className = `todo-item${todo.isCompleted ? " completed" : ""}`;
 
-  // ✅ Checkbox toggle
-  document.querySelectorAll(".todo-checkbox").forEach((checkbox) => {
-    checkbox.addEventListener("change", (e) => {
-      const parent = e.target.parentNode;
+  const checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.className = "todo-checkbox";
+  checkbox.checked = todo.isCompleted;
+  checkbox.setAttribute("aria-label", `Mark ${todo.title} as ${todo.isCompleted ? "active" : "completed"}`);
+  checkbox.addEventListener("change", () => toggleTodo(todo.id));
 
-      todos = todos.map((todo) => {
-        if (todo.id === parent.id) {
-          return { ...todo, isCompleted: e.target.checked };
-        }
-        return todo;
-      });
+  const text = document.createElement("span");
+  text.className = "todo-text";
+  text.textContent = todo.title;
 
-      localStorage.setItem("todos", JSON.stringify(todos));
-      populateTodos();
-    });
-  });
+  const remove = document.createElement("button");
+  remove.className = "delete-btn";
+  remove.type = "button";
+  remove.textContent = "×";
+  remove.title = "Delete task";
+  remove.setAttribute("aria-label", `Delete ${todo.title}`);
+  remove.addEventListener("click", () => deleteTodo(todo.id));
 
-  // ✅ Delete buttons
-  document.querySelectorAll(".delete-btn").forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      const confirmDelete = confirm("Do you want to delete this todo?");
-      if (!confirmDelete) return;
+  item.append(checkbox, text, remove);
+  return item;
+}
 
-      const parent = e.target.parentNode;
+function render() {
+  todoList.replaceChildren();
+  const tasks = visibleTodos();
+  if (!tasks.length) {
+    const empty = document.createElement("li");
+    empty.className = "empty-state";
+    const label = activeFilter === "all" ? "No tasks yet" : `No ${activeFilter} tasks`;
+    empty.innerHTML = `<div><strong>${label}</strong>${activeFilter === "all" ? "Add your first task above." : "Try another filter or add a task."}</div>`;
+    todoList.append(empty);
+  } else tasks.forEach(todo => todoList.append(makeTodoElement(todo)));
 
-      todos = todos.filter((todo) => todo.id !== parent.id);
+  const count = todos.filter(todo => !todo.isCompleted).length;
+  itemsLeft.textContent = `${count} ${count === 1 ? "item" : "items"} left`;
+  const completedCount = todos.filter(todo => todo.isCompleted).length;
+  clearCompletedButton.disabled = completedCount === 0;
+  clearCompletedButton.textContent = completedCount ? `Clear completed (${completedCount})` : "Clear completed";
+}
 
-      localStorage.setItem("todos", JSON.stringify(todos));
-      populateTodos();
-    });
-  });
+function toggleTodo(id) { todos = todos.map(todo => todo.id === id ? { ...todo, isCompleted: !todo.isCompleted } : todo); saveTodos(); render(); }
+function deleteTodo(id) { todos = todos.filter(todo => todo.id !== id); saveTodos(); render(); }
 
-  updateRemaining();
-};
-
-// ✅ Add new todo
-addTodoBtn.addEventListener("click", () => {
-  const todoText = inputTag.value.trim();
-
-  if (todoText.length < 4) {
-    alert("Todo must be at least 4 characters!");
-    return;
-  }
-
-  const todo = {
-    id: "todo-" + Date.now(),
-    title: todoText,
-    isCompleted: false,
-  };
-
-  todos.push(todo);
-
-  inputTag.value = "";
-  localStorage.setItem("todos", JSON.stringify(todos));
-  populateTodos();
+form.addEventListener("submit", event => {
+  event.preventDefault();
+  const title = input.value.trim();
+  if (title.length < 2) { formMessage.textContent = "Please enter at least 2 characters."; input.focus(); return; }
+  todos.unshift({ id: crypto.randomUUID?.() ?? `todo-${Date.now()}`, title, isCompleted: false });
+  input.value = "";
+  formMessage.textContent = "";
+  saveTodos(); render(); input.focus();
 });
 
-// ✅ Clear completed (MOVED OUTSIDE)
-clearCompletedBtn.addEventListener("click", () => {
-  todos = todos.filter((todo) => !todo.isCompleted);
-  localStorage.setItem("todos", JSON.stringify(todos));
-  populateTodos();
-});
+filterButtons.forEach(button => button.addEventListener("click", () => {
+  activeFilter = button.dataset.filter;
+  filterButtons.forEach(item => { const selected = item === button; item.classList.toggle("active", selected); item.setAttribute("aria-pressed", String(selected)); });
+  render();
+}));
 
-// ✅ Initial render
-populateTodos();
+clearCompletedButton.addEventListener("click", () => { todos = todos.filter(todo => !todo.isCompleted); saveTodos(); render(); });
+render();

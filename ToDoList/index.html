@@ -1,48 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Todo App - Starter Template</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A simple and persistent to-do list application.">
+  <title>My Todo List</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <div class="todo-app">
-            <header class="todo-header">
-                <h1>My Todo List</h1>
-                <p class="subtitle">Stay organized and productive</p>
-            </header>
+  <main class="container">
+    <section class="todo-app" aria-labelledby="appTitle">
+      <header class="todo-header">
+        <p class="eyebrow">DAILY FOCUS</p>
+        <h1 id="appTitle">My Todo List</h1>
+        <p class="subtitle">Stay organized and productive</p>
+      </header>
 
-            <div class="todo-input-container">
-                <input 
-                    type="text" 
-                    id="todoInput" 
-                    class="todo-input" 
-                    placeholder="Add a new task..."
-                    autocomplete="off"
-                >
-                <button id="addTodoBtn" class="add-btn">Add</button>
-            </div>
+      <form id="todoForm" class="todo-input-container" novalidate>
+        <label class="sr-only" for="todoInput">New task</label>
+        <input id="todoInput" class="todo-input" type="text" maxlength="120"
+          placeholder="What needs to be done?" autocomplete="off" required>
+        <button class="add-btn" type="submit">Add task</button>
+      </form>
+      <p id="formMessage" class="form-message" role="alert" aria-live="polite"></p>
 
-            <div class="filter-container">
-                <button class="filter-btn active" data-filter="all">All</button>
-                <button class="filter-btn" data-filter="active">Active</button>
-                <button class="filter-btn" data-filter="completed">Completed</button>
-            </div>
+      <nav class="filter-container" aria-label="Filter tasks">
+        <button class="filter-btn active" type="button" data-filter="all" aria-pressed="true">All</button>
+        <button class="filter-btn" type="button" data-filter="active" aria-pressed="false">Active</button>
+        <button class="filter-btn" type="button" data-filter="completed" aria-pressed="false">Completed</button>
+      </nav>
 
-            <ul id="todoList" class="todo-list">
-                <!-- Todo items will be dynamically added here -->
+      <ul id="todoList" class="todo-list" aria-live="polite"></ul>
 
-            </ul>
-
-            <div class="todo-footer">
-                <span id="itemsLeft" class="items-left">0</span>
-                <button id="clearCompletedBtn" class="clear-completed">Clear Completed</button>
-            </div>
-        </div>
-    </div>
-
-    <script src="app.js"></script>
+      <footer class="todo-footer">
+        <span id="itemsLeft" class="items-left">0 items left</span>
+        <button id="clearCompletedBtn" class="clear-completed" type="button">Clear completed</button>
+      </footer>
+    </section>
+  </main>
+  <script src="app.js"></script>
 </body>
 </html>
